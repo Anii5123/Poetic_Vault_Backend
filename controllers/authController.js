@@ -35,6 +35,8 @@ exports.register = async (req, res) => {
     });
 
     const token = generateToken(admin._id);
+    // Update
+    await admin.save()
 
     res.status(201).json({
       message: 'Admin registered successfully',
