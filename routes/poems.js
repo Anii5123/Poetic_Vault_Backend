@@ -44,7 +44,7 @@ const unlockValidation = [
 ];
 
 // Public routes
-router.post('/unlock/:id', unlockValidation, unlockPoem);
+router.post('/unlock', unlockValidation, unlockPoem);
 
 // Protected routes
 router.use(protect);

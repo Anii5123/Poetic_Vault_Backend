@@ -163,19 +163,59 @@ exports.deletePoem = async (req, res) => {
   }
 };
 
+// exports.unlockPoem = async (req, res) => {
+//   try {
+//     const { passcode, viewerName } = req.body;
+//     // const poemId = req.params.id;
+
+//     const poem = await Poem.findOne({ passcode: passcode, isActive: true });
+
+//     if (!poem) {
+//       return res.status(404).json({ message: 'Poem not found' });
+//     }
+
+//     if (poem.passcode !== passcode) {
+//       return res.status(401).json({ message: 'Invalid passcode' });
+//     }
+
+//     // Log the access
+//     poem.viewCount += 1;
+//     poem.accessLog.push({
+//       viewerName,
+//       viewedAt: new Date(),
+//       ipAddress: req.ip
+//     });
+
+//     await poem.save();
+
+//     res.json({
+//       message: 'Poem unlocked successfully',
+//       poem: {
+//         _id: poem._id,
+//         title: poem.title,
+//         content: poem.content,
+//         pdfUrl: poem.pdfUrl,
+//         author: poem.author,
+//         category: poem.category
+//       }
+//     })
+    
+    
+//     ;
+//   } catch (error) {
+//     console.error('Unlock poem error:', error);
+//     res.status(500).json({ message: 'Server error unlocking poem' });
+//   }
+// };
+
 exports.unlockPoem = async (req, res) => {
   try {
     const { passcode, viewerName } = req.body;
-    const poemId = req.params.id;
 
-    const poem = await Poem.findOne({ _id: poemId, isActive: true });
+    const poem = await Poem.findOne({ passcode: passcode, isActive: true });
 
     if (!poem) {
-      return res.status(404).json({ message: 'Poem not found' });
-    }
-
-    if (poem.passcode !== passcode) {
-      return res.status(401).json({ message: 'Invalid passcode' });
+      return res.status(404).json({ message: 'Poem not found or inactive' });
     }
 
     // Log the access
@@ -188,7 +228,7 @@ exports.unlockPoem = async (req, res) => {
 
     await poem.save();
 
-    res.json({
+    return res.status(200).json({
       message: 'Poem unlocked successfully',
       poem: {
         _id: poem._id,
@@ -201,7 +241,7 @@ exports.unlockPoem = async (req, res) => {
     });
   } catch (error) {
     console.error('Unlock poem error:', error);
-    res.status(500).json({ message: 'Server error unlocking poem' });
+    return res.status(500).json({ message: 'Server error unlocking poem' });
   }
 };
 
