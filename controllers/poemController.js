@@ -171,24 +171,23 @@ exports.unlockPoem = async (req, res) => {
     const poem = await Poem.findOne({ _id: poemId, isActive: true });
 
     if (!poem) {
-      return res.status(404).json({ message: 'Poem not found' });
+      return res.status(404).json({ message: 'Poem not found or inactive.' });
     }
 
     if (poem.passcode !== passcode) {
       return res.status(401).json({ message: 'Invalid passcode' });
     }
 
-    // Log the access
     poem.viewCount += 1;
     poem.accessLog.push({
       viewerName,
       viewedAt: new Date(),
-      ipAddress: req.ip
+      ipAddress: req.ip,
     });
 
     await poem.save();
 
-    res.json({
+    res.status(200).json({
       message: 'Poem unlocked successfully',
       poem: {
         _id: poem._id,
@@ -196,11 +195,11 @@ exports.unlockPoem = async (req, res) => {
         content: poem.content,
         pdfUrl: poem.pdfUrl,
         author: poem.author,
-        category: poem.category
-      }
+        category: poem.category,
+      },
     });
   } catch (error) {
-    console.error('Unlock poem error:', error);
+    console.error('Unlock poem error:', error.message, error.stack);
     res.status(500).json({ message: 'Server error unlocking poem' });
   }
 };

@@ -1,18 +1,38 @@
 const mongoose = require('mongoose');
 
+// Sub-schema for access log
+const accessLogSchema = new mongoose.Schema({
+  viewerName: {
+    type: String,
+    required: true,
+    trim: true,
+    maxlength: 100
+  },
+  viewedAt: {
+    type: Date,
+    default: Date.now
+  },
+  ipAddress: {
+    type: String
+  }
+}, { _id: false });
+
+// Main Poem schema
 const poemSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
+    maxlength: 200
   },
   content: {
     type: String,
-    required: function() { return !this.pdfUrl; }
+    required: function () { return !this.pdfUrl; },
+    maxlength: 10000
   },
   pdfUrl: {
     type: String,
-    required: function() { return !this.content; }
+    required: function () { return !this.content; }
   },
   passcode: {
     type: String,
@@ -21,7 +41,8 @@ const poemSchema = new mongoose.Schema({
   },
   author: {
     type: String,
-    default: 'Anonymous'
+    default: 'Anonymous',
+    trim: true
   },
   category: {
     type: String,
@@ -41,15 +62,12 @@ const poemSchema = new mongoose.Schema({
     ref: 'Admin',
     required: true
   },
-  accessLog: [{
-    viewerName: String,
-    viewedAt: { type: Date, default: Date.now },
-    ipAddress: String
-  }]
+  accessLog: [accessLogSchema]
 }, {
   timestamps: true
 });
 
+// Indexes
 poemSchema.index({ passcode: 1 });
 poemSchema.index({ createdBy: 1 });
 
